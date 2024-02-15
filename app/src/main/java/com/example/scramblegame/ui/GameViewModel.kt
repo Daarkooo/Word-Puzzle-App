@@ -79,6 +79,12 @@ class GameViewModel : ViewModel() { // the two points ':' means extends
         }
     }
 
+    fun skipWord(){
+        updateGameState(_uiState.value.score)
+        // Reset user guess
+        updateUserGuess("") // in the word guess box the place holder is shown <= ""
+    }
+
     fun resetGame(){
         usedWords.clear()
         _uiState.value = GameUiState(currentScrambleWord = pickRandomWordAndShuffle())
