@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.allWords
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +26,7 @@ class GameViewModel : ViewModel() { // the two points ':' means extends
     private var usedWords: MutableSet<String> = mutableSetOf()
 
 
-    private fun shuffleCurrentWord(word: String): String{
+    private fun shuffleCurrentWord(word: String): String{ // rearrange the order of the word's letters
         val tempWord = word.toCharArray()
         // Scramble the word
         tempWord.shuffle()
@@ -54,6 +55,8 @@ class GameViewModel : ViewModel() { // the two points ':' means extends
 
     fun checkUserGuess(){
         if (userGuess.equals(currentWord, ignoreCase = true)){
+            val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
+            updateGameState(updatedScore) // increase the score if the guess was correct
         } else{
             // User's guess is wrong, show an error
             _uiState.update { currentState ->
@@ -65,6 +68,16 @@ class GameViewModel : ViewModel() { // the two points ':' means extends
 
     }
 
+    private fun updateGameState(updatedScore: Int){
+        _uiState.update { currentState ->
+            currentState.copy(
+                isGuessedWordWrong = false,
+                currentScrambleWord = pickRandomWordAndShuffle(),
+                score = updatedScore,
+                currentWordCount = currentState.currentWordCount.inc(), // increase the number of words guessed
+            )
+        }
+    }
 
     fun resetGame(){
         usedWords.clear()
